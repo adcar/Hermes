@@ -1,0 +1,42 @@
+{:paths ["src" "resources"]
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        
+        ;; Web server
+        ring/ring-core {:mvn/version "1.10.0"}
+        ring/ring-jetty-adapter {:mvn/version "1.10.0"}
+        ring/ring-json {:mvn/version "0.5.1"}
+        ring-cors/ring-cors {:mvn/version "0.1.13"}
+        
+        ;; Routing
+        metosin/reitit {:mvn/version "0.7.0-alpha7"}
+        
+        ;; Database
+        com.github.seancorfield/next.jdbc {:mvn/version "1.3.894"}
+        org.postgresql/postgresql {:mvn/version "42.6.0"}
+        com.github.seancorfield/honeysql {:mvn/version "2.4.1066"}
+        
+        ;; HTTP client for OpenAI
+        clj-http/clj-http {:mvn/version "3.12.3"}
+        
+        ;; JSON
+        cheshire/cheshire {:mvn/version "5.12.0"}
+        
+        ;; Logging
+        org.clojure/tools.logging {:mvn/version "1.2.4"}
+        ch.qos.logback/logback-classic {:mvn/version "1.4.11"}
+        
+        ;; Environment
+        environ/environ {:mvn/version "1.2.0"}}
+ 
+ :aliases
+ {:dev {:extra-paths ["dev"]
+        :extra-deps {nrepl/nrepl {:mvn/version "1.1.0"}}}
+  
+  :run {:main-opts ["-m" "hermes.core"]}
+  
+  :uberjar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.1.303"}}
+            :exec-fn hf.depstar/uberjar
+            :exec-args {:jar "target/hermes.jar"
+                        :aot true
+                        :main-class hermes.core}}}}
+
