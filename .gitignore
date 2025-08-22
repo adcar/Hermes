@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+.cpcache/
+.nrepl-port
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Build outputs
+.next/
+out/
+target/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
