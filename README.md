@@ -2,8 +2,6 @@
 
 Hermes is a full-stack application that lets you query your PostgreSQL database using natural language. Think of it as "Perplexity for your data" - ask questions like "What's our revenue this quarter?" and get answers with beautiful visualizations.
 
-![Hermes Screenshot](docs/screenshot.png)
-
 ## Features
 
 - 🗣️ **Natural Language Queries** - Ask questions in plain English
