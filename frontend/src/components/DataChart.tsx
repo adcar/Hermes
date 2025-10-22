@@ -222,7 +222,7 @@ export function DataChart({ data, chartType, xAxis, yAxis }: DataChartProps) {
             outerRadius={120}
             innerRadius={60}
             paddingAngle={2}
-            label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+            label={({ name, percent }) => `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`}
             labelLine={{ stroke: '#606070' }}
           >
             {formattedData.map((_, index) => (
