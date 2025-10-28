@@ -121,7 +121,7 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setShowSchema(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] border border-[var(--border-subtle)] transition-all"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] border border-[var(--border-subtle)] transition-all cursor-pointer"
             >
               <Database className="w-4 h-4" />
               Schema
@@ -142,7 +142,7 @@ export default function Home() {
             {backendStatus === 'offline' && (
               <button
                 onClick={checkBackendHealth}
-                className="flex items-center gap-2 text-sm text-[var(--error)] hover:text-[var(--text-primary)] transition-colors"
+                className="flex items-center gap-2 text-sm text-[var(--error)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
               >
                 <AlertCircle className="w-4 h-4" />
                 Backend offline – Click to retry
@@ -180,7 +180,7 @@ export default function Home() {
                     key={i}
                     onClick={() => handleExampleClick(question)}
                     disabled={backendStatus !== 'online'}
-                    className="text-left px-4 py-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="text-left px-4 py-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <span className="text-[var(--accent-primary)] mr-2">→</span>
                     {question}
@@ -207,7 +207,7 @@ export default function Home() {
         )}
 
         {/* Input */}
-        <div className="flex-shrink-0 py-6 sticky bottom-0 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)] to-transparent pt-12">
+        <div className="flex-shrink-0 py-6">
           <ChatInput
             onSend={handleSend}
             isLoading={isLoading}

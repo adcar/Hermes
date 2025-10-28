@@ -51,7 +51,7 @@ export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
         <button
           type="submit"
           disabled={!input.trim() || isLoading || disabled}
-          className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-white transition-all hover:shadow-[0_4px_20px_var(--accent-glow)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+          className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-white transition-all hover:shadow-[0_4px_20px_var(--accent-glow)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
         >
           {isLoading ? (
             <Loader2 className="w-5 h-5 animate-spin" />

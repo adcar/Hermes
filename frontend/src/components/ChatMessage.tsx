@@ -97,7 +97,7 @@ export function ChatMessage({ type, content, result, isLoading, onFollowUp }: Ch
             <div className="bg-[var(--bg-tertiary)] rounded-xl px-4 py-3 border border-[var(--border-subtle)]">
               <button
                 onClick={() => setShowInsights(!showInsights)}
-                className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors w-full"
+                className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors w-full cursor-pointer"
               >
                 {showInsights ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 Key Insights
@@ -120,7 +120,7 @@ export function ChatMessage({ type, content, result, isLoading, onFollowUp }: Ch
             <div className="bg-[var(--bg-tertiary)] rounded-xl px-4 py-3 border border-[var(--border-subtle)]">
               <button
                 onClick={() => setShowSQL(!showSQL)}
-                className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors w-full"
+                className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors w-full cursor-pointer"
               >
                 <Database className="w-4 h-4" />
                 {showSQL ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}

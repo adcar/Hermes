@@ -107,7 +107,7 @@ export function SchemaViewer({ isOpen, onClose }: SchemaViewerProps) {
             <div className="flex bg-[var(--bg-tertiary)] rounded-lg p-1">
               <button
                 onClick={() => setActiveTab('tables')}
-                className={`px-4 py-1.5 text-sm rounded-md transition-all ${
+                className={`px-4 py-1.5 text-sm rounded-md transition-all cursor-pointer ${
                   activeTab === 'tables'
                     ? 'bg-[var(--accent-primary)] text-white'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
@@ -117,7 +117,7 @@ export function SchemaViewer({ isOpen, onClose }: SchemaViewerProps) {
               </button>
               <button
                 onClick={() => setActiveTab('erd')}
-                className={`px-4 py-1.5 text-sm rounded-md transition-all ${
+                className={`px-4 py-1.5 text-sm rounded-md transition-all cursor-pointer ${
                   activeTab === 'erd'
                     ? 'bg-[var(--accent-primary)] text-white'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
@@ -128,7 +128,7 @@ export function SchemaViewer({ isOpen, onClose }: SchemaViewerProps) {
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-[var(--bg-tertiary)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+              className="p-2 rounded-lg hover:bg-[var(--bg-tertiary)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -152,7 +152,7 @@ export function SchemaViewer({ isOpen, onClose }: SchemaViewerProps) {
                     {/* Table Header */}
                     <button
                       onClick={() => toggleTable(tableName)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[var(--bg-primary)] transition-colors"
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[var(--bg-primary)] transition-colors cursor-pointer"
                     >
                       {expandedTables.has(tableName) ? (
                         <ChevronDown className="w-4 h-4 text-[var(--text-muted)]" />
