@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { ChatMessage } from '@/components/ChatMessage';
 import { ChatInput } from '@/components/ChatInput';
 import { SchemaViewer } from '@/components/SchemaViewer';
 import { queryData, checkHealth, QueryResult } from '@/lib/api';
-import { Database, Zap, AlertCircle, RefreshCw } from 'lucide-react';
+import { Database, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -108,8 +109,14 @@ export default function Home() {
             onClick={() => setMessages([])}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center glow-accent">
-              <Database className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center glow-accent p-2">
+              <Image
+                src="/hermes-icon.svg"
+                alt="Hermes"
+                width={24}
+                height={24}
+                className="w-6 h-6"
+              />
             </div>
             <div className="text-left">
               <h1 className="text-xl font-bold gradient-text">Hermes</h1>
@@ -158,8 +165,14 @@ export default function Home() {
           /* Empty state */
           <div className="flex-1 flex flex-col items-center justify-center py-12">
             <div className="text-center mb-12">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center mx-auto mb-6 glow-accent">
-                <Zap className="w-10 h-10 text-white" />
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center mx-auto mb-6 glow-accent p-4">
+                <Image
+                  src="/hermes-icon.svg"
+                  alt="Hermes"
+                  width={48}
+                  height={48}
+                  className="w-12 h-12"
+                />
               </div>
               <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-3">
                 Ask anything about your data

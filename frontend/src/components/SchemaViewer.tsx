@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Database, Table2, Key, Link2, X, ChevronDown, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
+import { Table2, Key, Link2, X, ChevronDown, ChevronRight } from 'lucide-react';
 
 interface Column {
   column_name: string;
@@ -92,8 +93,8 @@ export function SchemaViewer({ isOpen, onClose }: SchemaViewerProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--accent-primary)] flex items-center justify-center">
-              <Database className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-full bg-[var(--accent-primary)] flex items-center justify-center p-2">
+              <Image src="/hermes-icon.svg" alt="Hermes" width={24} height={24} className="w-6 h-6" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-[var(--text-primary)]">Database Schema</h2>
