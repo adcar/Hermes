@@ -209,141 +209,153 @@ export function DataChart({ data, chartType, xAxis, yAxis }: DataChartProps) {
   // Use formatted x value or original
   const displayXKey = isMonthField(xKey) ? '_xFormatted' : xKey;
 
+  // Wrapper style to prevent tooltip overflow causing horizontal scrollbars
+  const chartWrapperStyle = { overflow: 'hidden' as const, width: '100%' };
+
   if (chartType === 'pie') {
     return (
-      <ResponsiveContainer width="100%" height={350}>
-        <PieChart>
-          <Pie
-            data={formattedData}
-            dataKey={yKey}
-            nameKey={displayXKey}
-            cx="50%"
-            cy="50%"
-            outerRadius={120}
-            innerRadius={60}
-            paddingAngle={2}
-            label={({ name, percent }) => `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`}
-            labelLine={{ stroke: '#606070' }}
-          >
-            {formattedData.map((_, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip
-            formatter={(value: number) => formatTooltip(value)}
-            contentStyle={{
-              background: '#2e2222',
-              border: '1px solid rgba(255,200,200,0.1)',
-              borderRadius: '8px',
-              color: '#f5f0f0',
-            }}
-          />
-          <Legend wrapperStyle={{ color: '#a0a0b0' }} />
-        </PieChart>
-      </ResponsiveContainer>
+      <div style={chartWrapperStyle}>
+        <ResponsiveContainer width="100%" height={350}>
+          <PieChart>
+            <Pie
+              data={formattedData}
+              dataKey={yKey}
+              nameKey={displayXKey}
+              cx="50%"
+              cy="50%"
+              outerRadius={120}
+              innerRadius={60}
+              paddingAngle={2}
+              label={({ name, percent }) => `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`}
+              labelLine={{ stroke: '#606070' }}
+            >
+              {formattedData.map((_, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(value: number) => formatTooltip(value)}
+              contentStyle={{
+                background: '#2e2222',
+                border: '1px solid rgba(255,200,200,0.1)',
+                borderRadius: '8px',
+                color: '#f5f0f0',
+              }}
+              wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
+            />
+            <Legend wrapperStyle={{ color: '#a0a0b0' }} />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
     );
   }
 
   if (chartType === 'line') {
     return (
-      <ResponsiveContainer width="100%" height={320}>
-        <LineChart {...commonProps}>
-          <CartesianGrid {...gridStyle} />
-          <XAxis
-            dataKey={displayXKey}
-            tick={axisStyle}
-            axisLine={{ stroke: 'rgba(255,200,200,0.15)' }}
-            tickLine={{ stroke: 'rgba(255,200,200,0.15)' }}
-            angle={-35}
-            textAnchor="end"
-            height={30}
-            interval={0}
-          />
-          <YAxis
-            tick={axisStyle}
-            axisLine={{ stroke: 'rgba(255,200,200,0.15)' }}
-            tickLine={{ stroke: 'rgba(255,200,200,0.15)' }}
-            tickFormatter={formatYAxis}
-            domain={yDomain}
-            width={50}
-          />
-          <Tooltip
-            formatter={(value: number) => [formatTooltip(value), yAxisLabel]}
-            labelFormatter={(label, payload) => {
-              const original = payload?.[0]?.payload?.['_xOriginal'];
-              return `${xAxisLabel}: ${original || label}`;
-            }}
-            contentStyle={{
-              background: '#2e2222',
-              border: '1px solid rgba(255,200,200,0.1)',
-              borderRadius: '8px',
-              color: '#f5f0f0',
-            }}
-          />
-          <Line
-            type="monotone"
-            dataKey={yKey}
-            stroke={COLORS[0]}
-            strokeWidth={3}
-            dot={{ fill: COLORS[0], strokeWidth: 0, r: 5 }}
-            activeDot={{ r: 7, fill: COLORS[1] }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      <div style={chartWrapperStyle}>
+        <ResponsiveContainer width="100%" height={320}>
+          <LineChart {...commonProps}>
+            <CartesianGrid {...gridStyle} />
+            <XAxis
+              dataKey={displayXKey}
+              tick={axisStyle}
+              axisLine={{ stroke: 'rgba(255,200,200,0.15)' }}
+              tickLine={{ stroke: 'rgba(255,200,200,0.15)' }}
+              angle={-35}
+              textAnchor="end"
+              height={30}
+              interval={0}
+            />
+            <YAxis
+              tick={axisStyle}
+              axisLine={{ stroke: 'rgba(255,200,200,0.15)' }}
+              tickLine={{ stroke: 'rgba(255,200,200,0.15)' }}
+              tickFormatter={formatYAxis}
+              domain={yDomain}
+              width={50}
+            />
+            <Tooltip
+              formatter={(value: number) => [formatTooltip(value), yAxisLabel]}
+              labelFormatter={(label, payload) => {
+                const original = payload?.[0]?.payload?.['_xOriginal'];
+                return `${xAxisLabel}: ${original || label}`;
+              }}
+              contentStyle={{
+                background: '#2e2222',
+                border: '1px solid rgba(255,200,200,0.1)',
+                borderRadius: '8px',
+                color: '#f5f0f0',
+              }}
+              wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
+            />
+            <Line
+              type="monotone"
+              dataKey={yKey}
+              stroke={COLORS[0]}
+              strokeWidth={3}
+              dot={{ fill: COLORS[0], strokeWidth: 0, r: 5 }}
+              activeDot={{ r: 7, fill: COLORS[1] }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     );
   }
 
   if (chartType === 'area') {
     return (
-      <ResponsiveContainer width="100%" height={320}>
-        <AreaChart {...commonProps}>
-          <defs>
-            <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={COLORS[0]} stopOpacity={0.4} />
-              <stop offset="95%" stopColor={COLORS[0]} stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid {...gridStyle} />
-          <XAxis
-            dataKey={displayXKey}
-            tick={axisStyle}
-            axisLine={{ stroke: 'rgba(255,200,200,0.15)' }}
-            tickLine={{ stroke: 'rgba(255,200,200,0.15)' }}
-            angle={-35}
-            textAnchor="end"
-            height={30}
-            interval={0}
-          />
-          <YAxis
-            tick={axisStyle}
-            axisLine={{ stroke: 'rgba(255,200,200,0.15)' }}
-            tickLine={{ stroke: 'rgba(255,200,200,0.15)' }}
-            tickFormatter={formatYAxis}
-            domain={yDomain}
-            width={50}
-          />
-          <Tooltip
-            formatter={(value: number) => [formatTooltip(value), yAxisLabel]}
-            labelFormatter={(label, payload) => {
-              const original = payload?.[0]?.payload?.['_xOriginal'];
-              return `${xAxisLabel}: ${original || label}`;
-            }}
-            contentStyle={{
-              background: '#2e2222',
-              border: '1px solid rgba(255,200,200,0.1)',
-              borderRadius: '8px',
-              color: '#f5f0f0',
-            }}
-          />
-          <Area
-            type="monotone"
-            dataKey={yKey}
-            stroke={COLORS[0]}
-            strokeWidth={2}
-            fill="url(#colorGradient)"
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+      <div style={chartWrapperStyle}>
+        <ResponsiveContainer width="100%" height={320}>
+          <AreaChart {...commonProps}>
+            <defs>
+              <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={COLORS[0]} stopOpacity={0.4} />
+                <stop offset="95%" stopColor={COLORS[0]} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid {...gridStyle} />
+            <XAxis
+              dataKey={displayXKey}
+              tick={axisStyle}
+              axisLine={{ stroke: 'rgba(255,200,200,0.15)' }}
+              tickLine={{ stroke: 'rgba(255,200,200,0.15)' }}
+              angle={-35}
+              textAnchor="end"
+              height={30}
+              interval={0}
+            />
+            <YAxis
+              tick={axisStyle}
+              axisLine={{ stroke: 'rgba(255,200,200,0.15)' }}
+              tickLine={{ stroke: 'rgba(255,200,200,0.15)' }}
+              tickFormatter={formatYAxis}
+              domain={yDomain}
+              width={50}
+            />
+            <Tooltip
+              formatter={(value: number) => [formatTooltip(value), yAxisLabel]}
+              labelFormatter={(label, payload) => {
+                const original = payload?.[0]?.payload?.['_xOriginal'];
+                return `${xAxisLabel}: ${original || label}`;
+              }}
+              contentStyle={{
+                background: '#2e2222',
+                border: '1px solid rgba(255,200,200,0.1)',
+                borderRadius: '8px',
+                color: '#f5f0f0',
+              }}
+              wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
+            />
+            <Area
+              type="monotone"
+              dataKey={yKey}
+              stroke={COLORS[0]}
+              strokeWidth={2}
+              fill="url(#colorGradient)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
     );
   }
 
@@ -353,47 +365,50 @@ export function DataChart({ data, chartType, xAxis, yAxis }: DataChartProps) {
   const barXAxisHeight = manyBars ? 100 : 50;
   
   return (
-    <ResponsiveContainer width="100%" height={barChartHeight}>
-      <BarChart {...commonProps} margin={{ top: 10, right: 15, left: 5, bottom: manyBars ? 30 : 10 }}>
-        <CartesianGrid {...gridStyle} />
-        <XAxis
-          dataKey={displayXKey}
-          tick={{ ...axisStyle, fontSize: manyBars ? 9 : 12 }}
-          axisLine={{ stroke: 'rgba(255,200,200,0.15)' }}
-          tickLine={{ stroke: 'rgba(255,200,200,0.15)' }}
-          angle={-55}
-          textAnchor="end"
-          height={barXAxisHeight}
-          interval={0}
-        />
-        <YAxis
-          tick={axisStyle}
-          axisLine={{ stroke: 'rgba(255,200,200,0.15)' }}
-          tickLine={{ stroke: 'rgba(255,200,200,0.15)' }}
-          tickFormatter={formatYAxis}
-          domain={yDomain}
-          width={50}
-        />
-        <Tooltip
-          formatter={(value: number) => [formatTooltip(value), yAxisLabel]}
-          labelFormatter={(label, payload) => {
-            const original = payload?.[0]?.payload?.['_xOriginal'];
-            return `${xAxisLabel}: ${original || label}`;
-          }}
-          contentStyle={{
-            background: '#2e2222',
-            border: '1px solid rgba(255,200,200,0.1)',
-            borderRadius: '8px',
-            color: '#f5f0f0',
-          }}
-          cursor={{ fill: 'rgba(220, 38, 38, 0.1)' }}
-        />
-        <Bar
-          dataKey={yKey}
-          fill={COLORS[0]}
-          radius={[4, 4, 0, 0]}
-        />
-      </BarChart>
-    </ResponsiveContainer>
+    <div style={chartWrapperStyle}>
+      <ResponsiveContainer width="100%" height={barChartHeight}>
+        <BarChart {...commonProps} margin={{ top: 10, right: 15, left: 5, bottom: manyBars ? 30 : 10 }}>
+          <CartesianGrid {...gridStyle} />
+          <XAxis
+            dataKey={displayXKey}
+            tick={{ ...axisStyle, fontSize: manyBars ? 9 : 12 }}
+            axisLine={{ stroke: 'rgba(255,200,200,0.15)' }}
+            tickLine={{ stroke: 'rgba(255,200,200,0.15)' }}
+            angle={-55}
+            textAnchor="end"
+            height={barXAxisHeight}
+            interval={0}
+          />
+          <YAxis
+            tick={axisStyle}
+            axisLine={{ stroke: 'rgba(255,200,200,0.15)' }}
+            tickLine={{ stroke: 'rgba(255,200,200,0.15)' }}
+            tickFormatter={formatYAxis}
+            domain={yDomain}
+            width={50}
+          />
+          <Tooltip
+            formatter={(value: number) => [formatTooltip(value), yAxisLabel]}
+            labelFormatter={(label, payload) => {
+              const original = payload?.[0]?.payload?.['_xOriginal'];
+              return `${xAxisLabel}: ${original || label}`;
+            }}
+            contentStyle={{
+              background: '#2e2222',
+              border: '1px solid rgba(255,200,200,0.1)',
+              borderRadius: '8px',
+              color: '#f5f0f0',
+            }}
+            wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
+            cursor={{ fill: 'rgba(220, 38, 38, 0.1)' }}
+          />
+          <Bar
+            dataKey={yKey}
+            fill={COLORS[0]}
+            radius={[4, 4, 0, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   );
 }

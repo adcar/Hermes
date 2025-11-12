@@ -5,7 +5,7 @@ import { QueryResult } from '@/lib/api';
 import { DataChart } from './DataChart';
 import { DataTable } from './DataTable';
 import { SqlHighlight } from './SqlHighlight';
-import { User, ChevronDown, ChevronUp, Database } from 'lucide-react';
+import { User, ChevronDown, ChevronUp, Database, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 
 interface ChatMessageProps {
@@ -13,10 +13,12 @@ interface ChatMessageProps {
   content: string;
   result?: QueryResult;
   isLoading?: boolean;
+  isRegenerating?: boolean;
   onFollowUp?: (question: string) => void;
+  onRegenerate?: () => void;
 }
 
-export function ChatMessage({ type, content, result, isLoading, onFollowUp }: ChatMessageProps) {
+export function ChatMessage({ type, content, result, isLoading, isRegenerating, onFollowUp, onRegenerate }: ChatMessageProps) {
   const [showSQL, setShowSQL] = useState(false);
   const [showInsights, setShowInsights] = useState(true);
 
@@ -61,10 +63,12 @@ export function ChatMessage({ type, content, result, isLoading, onFollowUp }: Ch
           <Image src="/hermes-icon.svg" alt="Hermes" width={20} height={20} className="w-5 h-5" />
         </div>
         <div className="flex-1 space-y-4 min-w-0">
-          {/* Main answer */}
-          <div className="bg-[var(--bg-secondary)] rounded-2xl rounded-tl-sm px-5 py-4 border border-[var(--border-subtle)]">
-            <p className="text-[var(--text-primary)] leading-relaxed whitespace-pre-wrap">{result?.answer || content}</p>
-          </div>
+          {/* Main answer - shown when AI decides commentary adds value */}
+          {(result?.show_answer !== false) && (
+            <div className="bg-[var(--bg-secondary)] rounded-2xl rounded-tl-sm px-5 py-4 border border-[var(--border-subtle)]">
+              <p className="text-[var(--text-primary)] leading-relaxed whitespace-pre-wrap">{result?.answer || content}</p>
+            </div>
+          )}
 
           {/* Visualization */}
           {result && result.success && result.data && result.data.length > 0 && (
@@ -136,6 +140,18 @@ export function ChatMessage({ type, content, result, isLoading, onFollowUp }: Ch
                 </div>
               )}
             </div>
+          )}
+
+          {/* Regenerate button */}
+          {onRegenerate && result && (
+            <button
+              onClick={onRegenerate}
+              disabled={isRegenerating}
+              className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isRegenerating ? 'animate-spin' : ''}`} />
+              {isRegenerating ? 'Regenerating...' : 'Regenerate'}
+            </button>
           )}
 
           {/* Follow-up questions */}

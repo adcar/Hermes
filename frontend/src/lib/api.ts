@@ -12,6 +12,7 @@ export interface QueryResult {
   data: Record<string, unknown>[];
   row_count: number;
   answer: string;
+  show_answer?: boolean;
   insights?: string[];
   follow_up_questions?: string[];
   error?: string;

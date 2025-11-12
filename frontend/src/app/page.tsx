@@ -28,6 +28,7 @@ const EXAMPLE_QUESTIONS = [
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [showSchema, setShowSchema] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -97,6 +98,43 @@ export default function Home() {
   function handleExampleClick(question: string) {
     if (!isLoading && backendStatus === 'online') {
       handleSend(question);
+    }
+  }
+
+  async function handleRegenerate(assistantMessageId: string) {
+    // Find the user message that came before this assistant message
+    const messageIndex = messages.findIndex(m => m.id === assistantMessageId);
+    if (messageIndex <= 0) return;
+    
+    const userMessage = messages[messageIndex - 1];
+    if (userMessage.type !== 'user') return;
+    
+    setRegeneratingId(assistantMessageId);
+    
+    try {
+      const result = await queryData(userMessage.content);
+      
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === assistantMessageId
+            ? { ...msg, result, content: result.answer || '' }
+            : msg
+        )
+      );
+    } catch (error) {
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === assistantMessageId
+            ? {
+                ...msg,
+                content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                result: undefined,
+              }
+            : msg
+        )
+      );
+    } finally {
+      setRegeneratingId(null);
     }
   }
 
@@ -193,10 +231,10 @@ export default function Home() {
                     key={i}
                     onClick={() => handleExampleClick(question)}
                     disabled={backendStatus !== 'online'}
-                    className="text-left px-4 py-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center text-left px-4 py-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <span className="text-[var(--accent-primary)] mr-2">→</span>
-                    {question}
+                    <span className="text-[var(--accent-primary)] mr-2 text-lg leading-none">→</span>
+                    <span>{question}</span>
                   </button>
                 ))}
               </div>
@@ -212,7 +250,9 @@ export default function Home() {
                 content={message.content}
                 result={message.result}
                 isLoading={message.isLoading}
+                isRegenerating={regeneratingId === message.id}
                 onFollowUp={handleSend}
+                onRegenerate={message.type === 'assistant' && !message.isLoading ? () => handleRegenerate(message.id) : undefined}
               />
             ))}
             <div ref={messagesEndRef} />

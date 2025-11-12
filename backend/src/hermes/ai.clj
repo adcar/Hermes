@@ -97,28 +97,42 @@ Chart type guidelines:
 (def analysis-system-prompt
   "You are a data analyst providing insights from query results.
 
-Given the user's original question and the query results, provide a clear, helpful response.
-
 Response format (JSON):
 {
-  \"answer\": \"Your natural language answer to the user's question\",
-  \"insights\": [\"Optional list of additional insights or observations\"],
-  \"follow_up_questions\": [\"Optional suggested follow-up questions the user might want to ask\"]
+  \"show_answer\": true or false,
+  \"answer\": \"Your natural language answer\",
+  \"insights\": [\"Optional observations or patterns\"],
+  \"follow_up_questions\": [\"Suggested follow-up questions\"]
 }
 
+CRITICAL RULE FOR show_answer:
+Set show_answer to FALSE if your answer would list, enumerate, or describe the individual rows.
+If you find yourself writing '1) X, 2) Y, 3) Z' or 'The top customers are A, B, C...' - that means show_answer must be FALSE.
+
+show_answer = FALSE when:
+- Answer would be a list/listicle of items from the results
+- Answer repeats data visible in the table/chart
+- Query is 'show me', 'list', 'top N', 'who are', 'what are' - these are self-explanatory
+- The visualization already answers the question completely
+
+show_answer = TRUE only when:
+- Explaining something non-obvious or unexpected
+- Results are empty and need explanation
+- Answering a 'why' or 'how' question
+- Important caveats the user should know
+
 Guidelines:
-- Be concise but thorough
 - Format numbers nicely (use commas, currency symbols where appropriate)
-- Mention trends or notable patterns
-- If results are empty, explain what that might mean
+- Put specific observations in the insights array
 - Suggest 1-3 relevant follow-up questions")
 
 (defn analyze-results-prompt
   "Generate prompt for analyzing query results"
-  [question sql results]
+  [question sql results visualization]
   [{:role "system" :content analysis-system-prompt}
    {:role "user" :content (str "Original Question: " question
                                "\n\nSQL Query Executed:\n" sql
+                               "\n\nVisualization type: " visualization
                                "\n\nResults (first 50 rows):\n" (json/generate-string (take 50 results) {:pretty true})
                                "\n\nTotal rows: " (count results))}])
 
@@ -127,13 +141,19 @@ Guidelines:
    If parsing fails and it looks like a clarification request, return a special response."
   [response]
   (try
-    (let [;; Remove markdown code blocks
-          cleaned (-> response
-                      (str/replace #"```json\s*" "")
+    (let [;; First, try to extract content from ```json ... ``` code block
+          code-block-match (re-find #"```json\s*([\s\S]*?)```" response)
+          ;; If we found a code block, use its contents; otherwise use the full response
+          content (if code-block-match
+                    (second code-block-match)
+                    response)
+          ;; Clean up any remaining markdown and trim
+          cleaned (-> content
                       (str/replace #"```\s*" "")
                       str/trim)
-          ;; Try to extract JSON object if there's extra text
-          json-match (re-find #"\{[\s\S]*\}" cleaned)
+          ;; Try to find a JSON object - look for balanced braces starting with {"
+          ;; This is more specific than just any curly brace
+          json-match (re-find #"\{\"[\s\S]*\}" cleaned)
           final-str (or json-match cleaned)]
       (json/parse-string final-str true))
     (catch Exception e
@@ -185,7 +205,8 @@ Guidelines:
                   _ (log/info "Query returned" (count results) "rows")
                   
                   ;; Analyze results
-                  analysis-response (call-openai (analyze-results-prompt question sql results))
+                  visualization (:visualization parsed)
+                  analysis-response (call-openai (analyze-results-prompt question sql results visualization))
                   analysis (parse-json-response analysis-response)
                   ;; Handle case where analysis also needs clarification
                   answer (if (:needs_clarification analysis)
@@ -196,13 +217,16 @@ Guidelines:
                :question question
                :sql sql
                :explanation (:explanation parsed)
-               :visualization (:visualization parsed)
+               :visualization visualization
                :chart_type (:chart_type parsed)
                :x_axis (:x_axis parsed)
                :y_axis (:y_axis parsed)
                :data results
                :row_count (count results)
                :answer answer
+               :show_answer (if (contains? analysis :show_answer)
+                              (:show_answer analysis)
+                              true)
                :insights (or (:insights analysis) [])
                :follow_up_questions (or (:follow_up_questions analysis) [])})
             

@@ -20,14 +20,11 @@ export function DataTable({ data }: DataTableProps) {
       return '—';
     }
     if (typeof value === 'number') {
-      // Check if it looks like a currency value
-      if (value >= 100) {
-        return value.toLocaleString('en-US', {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 2,
-        });
-      }
-      return value.toString();
+      // Format all numbers with reasonable precision
+      return value.toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      });
     }
     if (typeof value === 'boolean') {
       return value ? 'Yes' : 'No';
