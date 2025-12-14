@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { Table2, Key, Link2, X, ChevronDown, ChevronRight } from 'lucide-react';
 
@@ -27,40 +27,203 @@ interface Schema {
   [tableName: string]: TableSchema;
 }
 
+// Hardcoded schema for production security
+const HARDCODED_SCHEMA: Schema = {
+  departments: {
+    columns: [
+      { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'name', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'budget', data_type: 'numeric', is_nullable: 'NO', column_default: '0' },
+      { column_name: 'created_at', data_type: 'timestamp without time zone', is_nullable: 'YES', column_default: 'CURRENT_TIMESTAMP' },
+    ],
+    primary_keys: ['id'],
+    foreign_keys: [],
+  },
+  employees: {
+    columns: [
+      { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'first_name', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'last_name', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'email', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'department_id', data_type: 'integer', is_nullable: 'YES', column_default: null },
+      { column_name: 'role', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'salary', data_type: 'numeric', is_nullable: 'NO', column_default: null },
+      { column_name: 'hire_date', data_type: 'date', is_nullable: 'NO', column_default: null },
+      { column_name: 'is_active', data_type: 'boolean', is_nullable: 'YES', column_default: 'true' },
+      { column_name: 'performance_score', data_type: 'numeric', is_nullable: 'YES', column_default: null },
+      { column_name: 'created_at', data_type: 'timestamp without time zone', is_nullable: 'YES', column_default: 'CURRENT_TIMESTAMP' },
+    ],
+    primary_keys: ['id'],
+    foreign_keys: [{ column_name: 'department_id', foreign_table: 'departments', foreign_column: 'id' }],
+  },
+  categories: {
+    columns: [
+      { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'name', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'description', data_type: 'text', is_nullable: 'YES', column_default: null },
+      { column_name: 'created_at', data_type: 'timestamp without time zone', is_nullable: 'YES', column_default: 'CURRENT_TIMESTAMP' },
+    ],
+    primary_keys: ['id'],
+    foreign_keys: [],
+  },
+  products: {
+    columns: [
+      { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'name', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'category_id', data_type: 'integer', is_nullable: 'YES', column_default: null },
+      { column_name: 'sku', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'price', data_type: 'numeric', is_nullable: 'NO', column_default: null },
+      { column_name: 'cost', data_type: 'numeric', is_nullable: 'NO', column_default: null },
+      { column_name: 'stock_quantity', data_type: 'integer', is_nullable: 'YES', column_default: '0' },
+      { column_name: 'is_active', data_type: 'boolean', is_nullable: 'YES', column_default: 'true' },
+      { column_name: 'created_at', data_type: 'timestamp without time zone', is_nullable: 'YES', column_default: 'CURRENT_TIMESTAMP' },
+    ],
+    primary_keys: ['id'],
+    foreign_keys: [{ column_name: 'category_id', foreign_table: 'categories', foreign_column: 'id' }],
+  },
+  customer_segments: {
+    columns: [
+      { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'name', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'discount_percentage', data_type: 'numeric', is_nullable: 'YES', column_default: '0' },
+      { column_name: 'description', data_type: 'text', is_nullable: 'YES', column_default: null },
+    ],
+    primary_keys: ['id'],
+    foreign_keys: [],
+  },
+  customers: {
+    columns: [
+      { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'first_name', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'last_name', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'email', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'phone', data_type: 'character varying', is_nullable: 'YES', column_default: null },
+      { column_name: 'company_name', data_type: 'character varying', is_nullable: 'YES', column_default: null },
+      { column_name: 'segment_id', data_type: 'integer', is_nullable: 'YES', column_default: null },
+      { column_name: 'city', data_type: 'character varying', is_nullable: 'YES', column_default: null },
+      { column_name: 'state', data_type: 'character varying', is_nullable: 'YES', column_default: null },
+      { column_name: 'country', data_type: 'character varying', is_nullable: 'YES', column_default: "'USA'" },
+      { column_name: 'lifetime_value', data_type: 'numeric', is_nullable: 'YES', column_default: '0' },
+      { column_name: 'created_at', data_type: 'timestamp without time zone', is_nullable: 'YES', column_default: 'CURRENT_TIMESTAMP' },
+    ],
+    primary_keys: ['id'],
+    foreign_keys: [{ column_name: 'segment_id', foreign_table: 'customer_segments', foreign_column: 'id' }],
+  },
+  orders: {
+    columns: [
+      { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'order_number', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'customer_id', data_type: 'integer', is_nullable: 'YES', column_default: null },
+      { column_name: 'employee_id', data_type: 'integer', is_nullable: 'YES', column_default: null },
+      { column_name: 'status', data_type: 'character varying', is_nullable: 'NO', column_default: "'pending'" },
+      { column_name: 'subtotal', data_type: 'numeric', is_nullable: 'NO', column_default: null },
+      { column_name: 'tax', data_type: 'numeric', is_nullable: 'NO', column_default: '0' },
+      { column_name: 'discount', data_type: 'numeric', is_nullable: 'NO', column_default: '0' },
+      { column_name: 'total', data_type: 'numeric', is_nullable: 'NO', column_default: null },
+      { column_name: 'order_date', data_type: 'timestamp without time zone', is_nullable: 'NO', column_default: null },
+      { column_name: 'shipped_date', data_type: 'timestamp without time zone', is_nullable: 'YES', column_default: null },
+      { column_name: 'delivered_date', data_type: 'timestamp without time zone', is_nullable: 'YES', column_default: null },
+      { column_name: 'created_at', data_type: 'timestamp without time zone', is_nullable: 'YES', column_default: 'CURRENT_TIMESTAMP' },
+    ],
+    primary_keys: ['id'],
+    foreign_keys: [
+      { column_name: 'customer_id', foreign_table: 'customers', foreign_column: 'id' },
+      { column_name: 'employee_id', foreign_table: 'employees', foreign_column: 'id' },
+    ],
+  },
+  order_items: {
+    columns: [
+      { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'order_id', data_type: 'integer', is_nullable: 'YES', column_default: null },
+      { column_name: 'product_id', data_type: 'integer', is_nullable: 'YES', column_default: null },
+      { column_name: 'quantity', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'unit_price', data_type: 'numeric', is_nullable: 'NO', column_default: null },
+      { column_name: 'discount', data_type: 'numeric', is_nullable: 'YES', column_default: '0' },
+      { column_name: 'total', data_type: 'numeric', is_nullable: 'NO', column_default: null },
+    ],
+    primary_keys: ['id'],
+    foreign_keys: [
+      { column_name: 'order_id', foreign_table: 'orders', foreign_column: 'id' },
+      { column_name: 'product_id', foreign_table: 'products', foreign_column: 'id' },
+    ],
+  },
+  monthly_revenue: {
+    columns: [
+      { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'year', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'month', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'gross_revenue', data_type: 'numeric', is_nullable: 'NO', column_default: null },
+      { column_name: 'net_revenue', data_type: 'numeric', is_nullable: 'NO', column_default: null },
+      { column_name: 'total_orders', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'new_customers', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'returning_customers', data_type: 'integer', is_nullable: 'NO', column_default: null },
+    ],
+    primary_keys: ['id'],
+    foreign_keys: [],
+  },
+  expenses: {
+    columns: [
+      { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'category', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'description', data_type: 'text', is_nullable: 'YES', column_default: null },
+      { column_name: 'amount', data_type: 'numeric', is_nullable: 'NO', column_default: null },
+      { column_name: 'department_id', data_type: 'integer', is_nullable: 'YES', column_default: null },
+      { column_name: 'expense_date', data_type: 'date', is_nullable: 'NO', column_default: null },
+      { column_name: 'created_at', data_type: 'timestamp without time zone', is_nullable: 'YES', column_default: 'CURRENT_TIMESTAMP' },
+    ],
+    primary_keys: ['id'],
+    foreign_keys: [{ column_name: 'department_id', foreign_table: 'departments', foreign_column: 'id' }],
+  },
+  support_tickets: {
+    columns: [
+      { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'ticket_number', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'customer_id', data_type: 'integer', is_nullable: 'YES', column_default: null },
+      { column_name: 'assigned_to', data_type: 'integer', is_nullable: 'YES', column_default: null },
+      { column_name: 'subject', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'priority', data_type: 'character varying', is_nullable: 'NO', column_default: "'medium'" },
+      { column_name: 'status', data_type: 'character varying', is_nullable: 'NO', column_default: "'open'" },
+      { column_name: 'resolution_time_hours', data_type: 'numeric', is_nullable: 'YES', column_default: null },
+      { column_name: 'satisfaction_score', data_type: 'integer', is_nullable: 'YES', column_default: null },
+      { column_name: 'created_at', data_type: 'timestamp without time zone', is_nullable: 'NO', column_default: null },
+      { column_name: 'resolved_at', data_type: 'timestamp without time zone', is_nullable: 'YES', column_default: null },
+    ],
+    primary_keys: ['id'],
+    foreign_keys: [
+      { column_name: 'customer_id', foreign_table: 'customers', foreign_column: 'id' },
+      { column_name: 'assigned_to', foreign_table: 'employees', foreign_column: 'id' },
+    ],
+  },
+  campaigns: {
+    columns: [
+      { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+      { column_name: 'name', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'channel', data_type: 'character varying', is_nullable: 'NO', column_default: null },
+      { column_name: 'budget', data_type: 'numeric', is_nullable: 'NO', column_default: null },
+      { column_name: 'spend', data_type: 'numeric', is_nullable: 'YES', column_default: '0' },
+      { column_name: 'impressions', data_type: 'integer', is_nullable: 'YES', column_default: '0' },
+      { column_name: 'clicks', data_type: 'integer', is_nullable: 'YES', column_default: '0' },
+      { column_name: 'conversions', data_type: 'integer', is_nullable: 'YES', column_default: '0' },
+      { column_name: 'revenue_attributed', data_type: 'numeric', is_nullable: 'YES', column_default: '0' },
+      { column_name: 'start_date', data_type: 'date', is_nullable: 'NO', column_default: null },
+      { column_name: 'end_date', data_type: 'date', is_nullable: 'YES', column_default: null },
+      { column_name: 'status', data_type: 'character varying', is_nullable: 'YES', column_default: "'active'" },
+      { column_name: 'created_at', data_type: 'timestamp without time zone', is_nullable: 'YES', column_default: 'CURRENT_TIMESTAMP' },
+    ],
+    primary_keys: ['id'],
+    foreign_keys: [],
+  },
+};
+
 interface SchemaViewerProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
 export function SchemaViewer({ isOpen, onClose }: SchemaViewerProps) {
-  const [schema, setSchema] = useState<Schema | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [expandedTables, setExpandedTables] = useState<Set<string>>(new Set());
+  const [schema] = useState<Schema>(HARDCODED_SCHEMA);
+  const [expandedTables, setExpandedTables] = useState<Set<string>>(new Set(['campaigns']));
   const [activeTab, setActiveTab] = useState<'tables' | 'erd'>('tables');
-
-  useEffect(() => {
-    if (isOpen && !schema) {
-      fetchSchema();
-    }
-  }, [isOpen]);
-
-  const fetchSchema = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('http://localhost:3001/api/schema');
-      const data = await response.json();
-      setSchema(data.schema);
-      // Expand first table by default
-      const tables = Object.keys(data.schema);
-      if (tables.length > 0) {
-        setExpandedTables(new Set([tables[0]]));
-      }
-    } catch (error) {
-      console.error('Failed to fetch schema:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const toggleTable = (tableName: string) => {
     const newExpanded = new Set(expandedTables);
@@ -99,7 +262,7 @@ export function SchemaViewer({ isOpen, onClose }: SchemaViewerProps) {
             <div>
               <h2 className="text-lg font-semibold text-[var(--text-primary)]">Database Schema</h2>
               <p className="text-sm text-[var(--text-muted)]">
-                {schema ? `${Object.keys(schema).length} tables` : 'Loading...'}
+                {Object.keys(schema).length} tables
               </p>
             </div>
           </div>
@@ -138,14 +301,10 @@ export function SchemaViewer({ isOpen, onClose }: SchemaViewerProps) {
 
         {/* Content */}
         <div className="flex-1 overflow-hidden">
-          {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-[var(--accent-primary)] border-t-transparent" />
-            </div>
-          ) : activeTab === 'tables' ? (
+          {activeTab === 'tables' ? (
             <div className="h-full overflow-y-auto p-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {schema && Object.entries(schema).sort(([a], [b]) => a.localeCompare(b)).map(([tableName, tableSchema]) => (
+                {Object.entries(schema).sort(([a], [b]) => a.localeCompare(b)).map(([tableName, tableSchema]) => (
                   <div
                     key={tableName}
                     className="bg-[var(--bg-tertiary)] border border-[var(--border-subtle)] rounded-xl overflow-hidden"
@@ -228,9 +387,7 @@ export function SchemaViewer({ isOpen, onClose }: SchemaViewerProps) {
   );
 }
 
-function ERDiagram({ schema }: { schema: Schema | null }) {
-  if (!schema) return null;
-
+function ERDiagram({ schema }: { schema: Schema }) {
   const tables = Object.entries(schema);
   const relationships: { from: string; to: string; fromCol: string; toCol: string }[] = [];
 
@@ -245,11 +402,6 @@ function ERDiagram({ schema }: { schema: Schema | null }) {
       });
     });
   });
-
-  // Simple grid layout
-  const cols = 4;
-  const tableWidth = 200;
-  const tableGap = 40;
 
   return (
     <div className="relative">
