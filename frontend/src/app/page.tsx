@@ -198,10 +198,10 @@ export default function Home() {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col max-w-5xl w-full mx-auto px-6">
+      <main className="flex-1 flex flex-col max-w-5xl w-full mx-auto px-6 pb-36">
         {messages.length === 0 ? (
           /* Empty state */
-          <div className="flex-1 flex flex-col items-center justify-center py-12">
+          <div className="flex-1 flex flex-col items-center justify-center py-12 pb-24">
             <div className="text-center mb-12">
               <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center mx-auto mb-6 glow-accent p-4">
                 <Image
@@ -259,15 +259,18 @@ export default function Home() {
           </div>
         )}
 
-        {/* Input */}
-        <div className="flex-shrink-0 py-6">
+      </main>
+
+      {/* Floating Input */}
+      <div className="fixed bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)] to-transparent pt-6 pb-6">
+        <div className="max-w-5xl mx-auto px-6">
           <ChatInput
             onSend={handleSend}
             isLoading={isLoading}
             disabled={backendStatus !== 'online'}
           />
         </div>
-      </main>
+      </div>
 
       {/* Schema Viewer Modal */}
       <SchemaViewer isOpen={showSchema} onClose={() => setShowSchema(false)} />
